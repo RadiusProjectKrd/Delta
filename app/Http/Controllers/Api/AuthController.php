@@ -20,7 +20,7 @@ class AuthController extends Controller
 
         if($validator->fails()){
             return response()->json([
-                'success' => 'false',
+                'success' => false,
                 'message' => 'Validation Error'
             ], 400);
         }
@@ -46,11 +46,18 @@ class AuthController extends Controller
                 'token' => $success['token']
             ]);
         }
-        else{
+        else {
             return response()->json([
-                'success' => 'false',
+                'success' => false,
                 'message' => 'Validation Error'
             ], 400);
         }
+    }
+
+    public function user(Request $request) {
+        return response()->json([
+            'success' => true,
+            'user' => $request->user()
+        ]);
     }
 }

@@ -16,8 +16,9 @@ Route::get('/', function () {
     return response()->json(['success' => true]);
 });
 
-//Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/user', [AuthController::class, 'user'])->middleware(['auth:sanctum']);
 
 //Route::get('/bot/webhook', TelegramController::class, 'webhook');
 Route::post('/bot/handler', [TelegramController::class, 'handler']);
