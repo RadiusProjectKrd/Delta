@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+  # Delta API
+  delta:
+    image: delta
+    build:
+      context: .
+    container_name: delta_production
+    tty: true
+    working_dir: /var/www
+    networks:
+      - net
+
+  # Delta Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: delta_nginx_production
+    hostname: api
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./config/conf.d:/etc/nginx/conf.d
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
