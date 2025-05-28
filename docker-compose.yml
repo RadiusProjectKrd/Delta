@@ -6,7 +6,7 @@ services:
     image: delta
     build:
       context: .
-    container_name: delta_production
+    container_name: delta_radius
     tty: true
     working_dir: /var/www
     networks:
@@ -15,7 +15,7 @@ services:
   # Delta Nginx
   nginx:
     image: nginx:alpine
-    container_name: delta_nginx_production
+    container_name: delta_nginx_radius
     hostname: api
     tty: true
     ports:
