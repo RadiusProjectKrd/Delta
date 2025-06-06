@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Security;
 
 use App\Http\Controllers\Controller;
+use app\Models\Security\Ack;
 use app\Models\Security\Alarm;
 use app\Models\Security\Objects;
 use app\Models\Security\UserObjects;
@@ -147,13 +148,43 @@ class TelegramController extends Controller
                                     $this->withButtons(
                                         $this->builder('Активирована тревога по обьекту ' . $object_id . '!', $chatId),
                                         [
-                                            ['text' => 'Заркыть тревогу', 'command' => 'close alarm ' . $alarm->id]
+                                            ['text' => 'Заркыть тревогу', 'command' => 'close ' . $alarm->id]
                                         ]
                                     )
                                 );
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Обьект не найден', $chatId)
+                                );
+                            }
+                        } elseif (strpos('close ', $text)) {
+                            try {
+                                $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
+                                $object = Objects::getObject($alarm->object_id);
+                                Alarm::query()->where('alarm_id', '=', $alarm->id)->update([
+                                    'state' => 'close'
+                                ]);
+                                Alarm::closeAlarm($alarm->alarm_id);
+                                $this->response(
+                                    $this->builder('Тревога по обьекту ' . $object->id . ' закрыта', $chatId),
+                                );
+                            } catch (ModelNotFoundException $e) {
+                                $this->response(
+                                    $this->builder('Тревога не найдена', $chatId)
+                                );
+                            }
+
+                        } elseif (strpos('ack ', $text)) {
+                            try {
+                                $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
+                                $object = Objects::getObject($alarm->object_id);
+                                Ack::sendAck($alarm->alarm_id, $user);
+                                $this->response(
+                                    $this->builder('Сигнал реагирования отправлен', $chatId),
+                                );
+                            } catch (ModelNotFoundException $e) {
+                                $this->response(
+                                    $this->builder('Тревога не найдена', $chatId)
                                 );
                             }
                         } else {
