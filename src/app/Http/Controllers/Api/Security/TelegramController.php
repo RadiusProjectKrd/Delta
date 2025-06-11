@@ -21,9 +21,9 @@ class TelegramController extends Controller
 
     public function __construct()
     {
-        $this->token = config('app.telegram_token');
-        $this->broadcast_channel = config('app.telegram_broadcast_channel');
-        $this->broadcast_thread = config('app.telegram_broadcast_thread');
+        $this->token = config('telegram.security.token');
+        $this->broadcast_channel = config('telegram.security.broadcast_channel');
+        $this->broadcast_thread = config('telegram.security.broadcast_thread');
     }
 
     public function webhook(): void
