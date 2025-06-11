@@ -9,6 +9,8 @@ services:
     container_name: delta_production
     tty: true
     working_dir: /var/www
+    volumes:
+      - ./src:/var/www
     networks:
       - net
 
