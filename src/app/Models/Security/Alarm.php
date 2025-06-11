@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Models\Security;
+namespace App\Models\Security;
 
 use App\Http\Controllers\Api\Security\TelegramController;
 use Illuminate\Database\Eloquent\Model;

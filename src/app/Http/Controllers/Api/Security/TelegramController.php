@@ -3,16 +3,15 @@
 namespace App\Http\Controllers\Api\Security;
 
 use App\Http\Controllers\Controller;
-use app\Models\Security\Ack;
-use app\Models\Security\Alarm;
-use app\Models\Security\Objects;
-use app\Models\Security\UnderSecurity;
-use app\Models\Security\UserObjects;
+use App\Models\Security\Ack;
+use App\Models\Security\Alarm;
+use App\Models\Security\Objects;
+use App\Models\Security\UnderSecurity;
+use App\Models\Security\UserObjects;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 
 class TelegramController extends Controller
 {
