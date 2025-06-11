@@ -138,6 +138,7 @@ class TelegramController extends Controller
 
                     default:
                         if (strpos($callback['data'], 'alarm')) {
+                            Log::info('Trying to alarm');
                             try {
                                 $object_id = UserObjects::getOne($user, explode(' ', $text)[1]);
                                 $object = Objects::getObject($object_id);
@@ -160,6 +161,7 @@ class TelegramController extends Controller
                                 );
                             }
                         } elseif (strpos($callback['data'], 'close')) {
+                            Log::info('Trying to close');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
@@ -177,6 +179,7 @@ class TelegramController extends Controller
                             }
 
                         } elseif (strpos($callback['data'], 'ack')) {
+                            Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
