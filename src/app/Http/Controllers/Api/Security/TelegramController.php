@@ -148,7 +148,7 @@ class TelegramController extends Controller
                                 Alarm::openAlarm($alarm->id);
                                 $this->response(
                                     $this->withButtons(
-                                        $this->builder('Активирована тревога по обьекту ' . $object_id . '!', $chatId),
+                                        $this->builder('Активирована тревога по обьекту ' . $object_id->object_id . '!', $chatId),
                                         [
                                             ['text' => 'Заркыть тревогу', 'command' => 'close ' . $alarm->id]
                                         ]

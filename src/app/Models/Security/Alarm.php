@@ -29,9 +29,9 @@ class Alarm extends Model
                 $api->response(
                     $api->withButtons(
                         $api->builder(
-                            "<b>ТРЕВОГА</b>" .
-                            "Номер обьекта: " . $object_id .
-                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name .
+                            "<b>ТРЕВОГА</b> \n" .
+                            "Номер обьекта: " . $object_id . "\n" .
+                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
                             "Тип: " . $object->type,
                             $user->telegram_id),
                         [
@@ -43,10 +43,10 @@ class Alarm extends Model
                 $api->response(
                     $api->withButtons(
                         $api->builder(
-                            "<b>ТРЕВОГА</b>" .
-                            "Номер обьекта: " . $object_id .
-                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name .
-                            "Адресс: " . $object->address .
+                            "<b>ТРЕВОГА</b> \n" .
+                            "Номер обьекта: " . $object_id . "\n" .
+                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                            "Адресс: " . $object->address . "\n" .
                             "Тип: " . $object->type,
                             $user->telegram_id),
                         [
