@@ -19,7 +19,7 @@ services:
     hostname: api
     tty: true
     ports:
-      - "80:80"
+      - "5000:5000"
     volumes:
       - ./src:/var/www
       - ./config/conf.d:/etc/nginx/conf.d
