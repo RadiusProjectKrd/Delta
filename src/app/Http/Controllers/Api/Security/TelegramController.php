@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use app\Models\Security\Ack;
 use app\Models\Security\Alarm;
 use app\Models\Security\Objects;
+use app\Models\Security\UnderSecurity;
 use app\Models\Security\UserObjects;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class TelegramController extends Controller
             Log::info('New Group Message');
         }
 
-        $user = User::where('telegram_id', $chatId)->first();
+        $user = UnderSecurity::where('telegram_id', $chatId)->first();
         if ($user) {
             if ($callback != null) {
                 Log::info('Callback Proccessing');
