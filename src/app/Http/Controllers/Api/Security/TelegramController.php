@@ -94,7 +94,7 @@ class TelegramController extends Controller
                         break;
 
                     case 'objects':
-                        $objects = UserObjects::getAll($user);
+                        $objects = UserObjects::getAll($user->id);
                         if (count($objects) > 0) {
                             $this->response(
                                 $this->builder('Ваши обьекты:', $chatId)
