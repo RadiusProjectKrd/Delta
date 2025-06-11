@@ -104,11 +104,15 @@ class TelegramController extends Controller
                                 $object = Objects::getObject($user_object->object_id);
                                 if (is_null($object->address)) {
                                     $this->response(
+                                        $this->withButtons(
                                         $this->builder(
                                             "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
                                             "<b>Название:</b> " . $object->name . "\n" .
                                             "<b>Тип:</b> " . $object->type . "\n",
-                                            $chatId)
+                                            $chatId),
+                                        [
+                                            ['text' => 'Отправить тревогу', 'command' => 'alarm '.$object->id]
+                                        ])
                                     );
                                 } else {
                                     $this->response(
