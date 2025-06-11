@@ -140,7 +140,7 @@ class TelegramController extends Controller
                         if (strpos($callback['data'], 'alarm') === true or strpos($callback['data'], 'alarm') >= 0) {
                             Log::info('Trying to alarm');
                             try {
-                                $object_id = UserObjects::getOne($user, explode(' ', $text)[1]);
+                                $object_id = UserObjects::getOne($user, explode(' ', $callback['data'])[1]);
                                 $object = Objects::getObject($object_id);
                                 $alarm = Alarm::query()->create([
                                     'object_id' => $object_id,
@@ -163,7 +163,7 @@ class TelegramController extends Controller
                         } elseif (strpos($callback['data'], 'close') === true or strpos($callback['data'], 'close') >= 0) {
                             Log::info('Trying to close');
                             try {
-                                $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
+                                $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
                                 Alarm::query()->where('alarm_id', '=', $alarm->id)->update([
                                     'state' => 'close'
@@ -181,7 +181,7 @@ class TelegramController extends Controller
                         } elseif (strpos($callback['data'], 'ack') === true or strpos($callback['data'], 'ack') >= 0) {
                             Log::info('Trying to ack');
                             try {
-                                $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
+                                $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
                                 Ack::sendAck($alarm->alarm_id, $user);
                                 $this->response(
