@@ -70,19 +70,19 @@ class Alarm extends Model
             if (is_null($object->address)) {
                 $api->response(
                     $api->builder(
-                        "<b>Отбой тревоги</b>" .
-                        "Номер обьекта: " . $object_id .
-                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name .
+                        "<b>Отбой тревоги</b> \n" .
+                        "Номер обьекта: " . $object_id . "\n" .
+                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
                         "Тип: " . $object->type,
                         $user->telegram_id),
                 );
             } else {
                 $api->response(
                     $api->builder(
-                        "<b>Отбой тревоги</b>" .
-                        "Номер обьекта: " . $object_id .
-                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name .
-                        "Адресс: " . $object->address .
+                        "<b>Отбой тревоги</b> \n" .
+                        "Номер обьекта: " . $object_id . "\n" .
+                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                        "Адресс: " . $object->address . "\n" .
                         "Тип: " . $object->type,
                         $user->telegram_id),
                 );

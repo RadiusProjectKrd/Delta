@@ -137,7 +137,8 @@ class TelegramController extends Controller
                         break;
 
                     default:
-                        if (strpos($callback['data'], 'alarm') === true or strpos($callback['data'], 'alarm') >= 0) {
+                        $data = explode(' ', $callback['data']);
+                        if ($data[0] == 'alarm') {
                             Log::info('Trying to alarm');
                             try {
                                 $object_id = UserObjects::getOne($user->id, explode(' ', $callback['data'])[1]);
@@ -159,7 +160,7 @@ class TelegramController extends Controller
                                     $this->builder('Обьект не найден', $chatId)
                                 );
                             }
-                        } elseif (strpos($callback['data'], 'close') === true or strpos($callback['data'], 'close') >= 0) {
+                        } elseif ($data[0] == 'close') {
                             Log::info('Trying to close');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
@@ -169,7 +170,7 @@ class TelegramController extends Controller
                                 ]);
                                 Alarm::closeAlarm($alarm->alarm_id);
                                 $this->response(
-                                    $this->builder('Тревога по обьекту ' . $object->id . ' закрыта', $chatId),
+                                    $this->builder('Тревога по обьекту ' . $object->object_id . ' закрыта', $chatId),
                                 );
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
@@ -177,7 +178,7 @@ class TelegramController extends Controller
                                 );
                             }
 
-                        } elseif (strpos($callback['data'], 'ack') === true or strpos($callback['data'], 'ack') >= 0) {
+                        } elseif ($data[0] == 'ack') {
                             Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
