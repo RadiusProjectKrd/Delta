@@ -138,6 +138,7 @@ class TelegramController extends Controller
 
                     default:
                         $data = explode(' ', $callback['data']);
+                        Log::info(json_encode(['payload' => $data]));
                         if ($data[0] == 'alarm') {
                             Log::info('Trying to alarm');
                             try {
