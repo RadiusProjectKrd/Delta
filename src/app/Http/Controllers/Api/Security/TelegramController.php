@@ -26,13 +26,6 @@ class TelegramController extends Controller
         $this->broadcast_thread = config('telegram.security.broadcast_thread');
     }
 
-    public function webhook(): void
-    {
-        Log::info(Http::get('https://api.telegram.org/bot' . $this->token . '/setWebhook', [
-            'url' => 'imperator.ultimatex.tech/api/bot/security'
-        ]));
-    }
-
     public function broadcast(Request $request): void
     {
         $data = $this->builder($request->input('text'), $this->broadcast_channel);
@@ -91,7 +84,7 @@ class TelegramController extends Controller
                             $this->withButtons(
                                 $this->builder(
                                     "ID: " . $user->id . "\n" .
-                                    "Имя: " . $user->name . "\n",
+                                    "ФИО: " . $user->first_name . " " . $user->last_name ."\n",
                                     $chatId),
                                 [
                                     ['text' => 'На главную', 'command' => 'menu'],
@@ -104,7 +97,7 @@ class TelegramController extends Controller
                         $objects = UserObjects::getAll($user);
                         if (count($objects) > 0) {
                             $this->response(
-                                $this->builder('Ваши документы:', $chatId)
+                                $this->builder('Ваши обьекты:', $chatId)
                             );
 
                             foreach ($objects as $object) {

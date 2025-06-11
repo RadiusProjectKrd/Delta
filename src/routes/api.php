@@ -21,10 +21,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/user', [AuthController::class, 'user'])->middleware(['auth:sanctum']);
 
-//Route::get('/bot/webhook', TelegramController::class, 'webhook');
-Route::post('/bot/geo-ritm', [MinecraftTelegram::class, 'handler']);
+Route::post('/bot/minecraft', [MinecraftTelegram::class, 'handler']);
 Route::post('/bot/security', [SecurityTelegram::class, 'handler']);
-//Route::post('/bot/broadcast', [TelegramController::class, 'broadcast']);
 
 Route::get('/production/get/{name}', [ProductionController::class, 'get'])->middleware(['auth:sanctum']);
 //Route::get('/production/create/{name}/{type}/{ver}', [ProductionController::class, 'create']);
