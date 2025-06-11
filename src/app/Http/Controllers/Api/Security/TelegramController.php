@@ -169,7 +169,7 @@ class TelegramController extends Controller
                                 Alarm::query()->where('alarm_id', '=', $alarm->id)->update([
                                     'state' => 'close'
                                 ]);
-                                Alarm::closeAlarm($alarm->alarm_id);
+                                Alarm::closeAlarm($alarm->id);
                                 $this->response(
                                     $this->builder('Тревога по обьекту ' . $object->object_id . ' закрыта', $chatId),
                                 );
