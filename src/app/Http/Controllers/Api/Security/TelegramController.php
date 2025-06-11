@@ -140,7 +140,7 @@ class TelegramController extends Controller
                         if (strpos($callback['data'], 'alarm') === true or strpos($callback['data'], 'alarm') >= 0) {
                             Log::info('Trying to alarm');
                             try {
-                                $object_id = UserObjects::getOne($user, explode(' ', $callback['data'])[1]);
+                                $object_id = UserObjects::getOne($user->id, explode(' ', $callback['data'])[1]);
                                 $alarm = Alarm::query()->create([
                                     'object_id' => $object_id->object_id,
                                     'state' => 'open'
@@ -181,8 +181,7 @@ class TelegramController extends Controller
                             Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
-                                $object = Objects::getObject($alarm->object_id);
-                                Ack::sendAck($alarm->alarm_id, $user);
+                                Ack::sendAck($alarm->alarm_id, $user->id);
                                 $this->response(
                                     $this->builder('Сигнал реагирования отправлен', $chatId),
                                 );
