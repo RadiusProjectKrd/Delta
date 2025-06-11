@@ -137,7 +137,7 @@ class TelegramController extends Controller
                         break;
 
                     default:
-                        if (strpos('alarm', $callback['data'])) {
+                        if (strpos($callback['data'], 'alarm')) {
                             try {
                                 $object_id = UserObjects::getOne($user, explode(' ', $text)[1]);
                                 $object = Objects::getObject($object_id);
@@ -159,7 +159,7 @@ class TelegramController extends Controller
                                     $this->builder('Обьект не найден', $chatId)
                                 );
                             }
-                        } elseif (strpos('close', $callback['data'])) {
+                        } elseif (strpos($callback['data'], 'close')) {
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
@@ -176,7 +176,7 @@ class TelegramController extends Controller
                                 );
                             }
 
-                        } elseif (strpos('ack', $callback['data'])) {
+                        } elseif (strpos($callback['data'], 'ack')) {
                             try {
                                 $alarm = Alarm::query()->where('id', '=', explode(' ', $text)[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
