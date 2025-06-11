@@ -100,8 +100,8 @@ class TelegramController extends Controller
                                 $this->builder('Ваши обьекты:', $chatId)
                             );
 
-                            foreach ($objects as $object_id) {
-                                $object = Objects::getObject($object_id);
+                            foreach ($objects as $user_object) {
+                                $object = Objects::getObject($user_object->object_id);
                                 if (is_null($object->address)) {
                                     $this->response(
                                         $this->builder(
