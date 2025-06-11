@@ -84,7 +84,7 @@ class TelegramController extends Controller
                             $this->withButtons(
                                 $this->builder(
                                     "ID: " . $user->id . "\n" .
-                                    "ФИО: " . $user->first_name . " " . $user->last_name ."\n",
+                                    "ФИО: " . $user->first_name . " " . $user->last_name . "\n",
                                     $chatId),
                                 [
                                     ['text' => 'На главную', 'command' => 'menu'],
@@ -105,23 +105,27 @@ class TelegramController extends Controller
                                 if (is_null($object->address)) {
                                     $this->response(
                                         $this->withButtons(
-                                        $this->builder(
-                                            "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
-                                            "<b>Название:</b> " . $object->name . "\n" .
-                                            "<b>Тип:</b> " . $object->type . "\n",
-                                            $chatId),
-                                        [
-                                            ['text' => 'Отправить тревогу', 'command' => 'alarm '.$object->id]
-                                        ])
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                            ])
                                     );
                                 } else {
                                     $this->response(
-                                        $this->builder(
-                                            "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
-                                            "<b>Название:</b> " . $object->name . "\n" .
-                                            "<b>Адресс:</b> " . $object->address . "\n" .
-                                            "<b>Тип:</b> " . $object->type . "\n",
-                                            $chatId)
+                                        $this->withButtons(
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Адресс:</b> " . $object->address . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                            ])
                                     );
                                 }
                             }
