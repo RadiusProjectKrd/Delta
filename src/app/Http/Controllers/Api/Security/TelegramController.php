@@ -141,9 +141,8 @@ class TelegramController extends Controller
                             Log::info('Trying to alarm');
                             try {
                                 $object_id = UserObjects::getOne($user, explode(' ', $callback['data'])[1]);
-                                $object = Objects::getObject($object_id);
                                 $alarm = Alarm::query()->create([
-                                    'object_id' => $object_id,
+                                    'object_id' => $object_id->object_id,
                                     'state' => 'open'
                                 ]);
                                 Alarm::openAlarm($alarm->id);
