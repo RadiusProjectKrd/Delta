@@ -23,7 +23,7 @@ class Ack extends Model
         ]);
         $user = UnderSecurity::query()->where('user_id', '=', $user_id)->first();
         $api = new TelegramController();
-        $alarm = Alarm::query()->where('alarm_id', '=', $alarm_id)->first();
+        $alarm = Alarm::getAlarm($alarm_id);
         $owner_id = UserObjects::searchUserByObject($alarm->object_id);
         $owner = UnderSecurity::getUnderSecurityUser($owner_id->user_id);
         $api->response(

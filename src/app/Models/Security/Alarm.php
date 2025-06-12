@@ -16,10 +16,14 @@ class Alarm extends Model
         'state'
     ];
 
+    public static function getAlarm($id) {
+        return self::query()->where('id', '=', $id)->first();
+    }
+
     public static function openAlarm($alarm_id)
     {
         $api = new TelegramController();
-        $alarm = Alarm::query()->where('id', '=', $alarm_id)->first();
+        $alarm = self::getAlarm($alarm_id);
         $object_id = $alarm->object_id;
         $object = Objects::getObject($object_id);
         $user_object_id = UserObjects::searchUserByObject($object_id)->user_id;
@@ -61,7 +65,7 @@ class Alarm extends Model
     public static function closeAlarm($alarm_id)
     {
         $api = new TelegramController();
-        $alarm = Alarm::query()->where('id', '=', $alarm_id)->first();
+        $alarm = self::getAlarm($alarm_id);
         $object_id = $alarm->object_id;
         $object = Objects::getObject($object_id);
         $user_object_id = UserObjects::searchUserByObject($object_id)->user_id;
