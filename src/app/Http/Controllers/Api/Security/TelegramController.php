@@ -26,25 +26,11 @@ class TelegramController extends Controller
         $this->broadcast_thread = config('telegram.security.broadcast_thread');
     }
 
-    public function broadcast(Request $request): void
-    {
-        $data = $this->builder($request->input('text'), $this->broadcast_channel);
-        $data['reply_to_message_id'] = $this->broadcast_thread;
-        $this->response($data);
-    }
-
-    public function test_broadcast($text): void
+    public function broadcast($text): void
     {
         $data = $this->builder($text, $this->broadcast_channel);
         $data['reply_to_message_id'] = $this->broadcast_thread;
         $this->response($data);
-    }
-
-    public function test_message($text, $chatId)
-    {
-        $this->response(
-            $this->builder($text, $chatId)
-        );
     }
 
     public function handler(Request $request): void

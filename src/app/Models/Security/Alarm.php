@@ -30,34 +30,34 @@ class Alarm extends Model
         $user_object = UnderSecurity::getUnderSecurityUser($user_object_id);
         foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
             if (is_null($object->address)) {
+                $text = "<b>ТРЕВОГА</b> \n" .
+                    "Номер обьекта: " . $object_id . "\n" .
+                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Тип: " . $object->type;
                 $api->response(
                     $api->withButtons(
-                        $api->builder(
-                            "<b>ТРЕВОГА</b> \n" .
-                            "Номер обьекта: " . $object_id . "\n" .
-                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
-                            "Тип: " . $object->type,
-                            $user->telegram_id),
+                        $api->builder($text, $user->telegram_id),
                         [
                             ['text' => 'Отреагировать', 'command' => 'ack ' . $alarm_id]
                         ],
                     )
                 );
+                $api->broadcast($text);
             } else {
+                $text = "<b>ТРЕВОГА</b> \n" .
+                    "Номер обьекта: " . $object_id . "\n" .
+                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Адресс: " . $object->address . "\n" .
+                    "Тип: " . $object->type;
                 $api->response(
                     $api->withButtons(
-                        $api->builder(
-                            "<b>ТРЕВОГА</b> \n" .
-                            "Номер обьекта: " . $object_id . "\n" .
-                            "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
-                            "Адресс: " . $object->address . "\n" .
-                            "Тип: " . $object->type,
-                            $user->telegram_id),
+                        $api->builder($text, $user->telegram_id),
                         [
                             ['text' => 'Отреагировать', 'command' => 'ack ' . $alarm_id]
                         ],
                     )
                 );
+                $api->broadcast($text);
             }
         }
     }
@@ -72,24 +72,24 @@ class Alarm extends Model
         $user_object = UnderSecurity::getUnderSecurityUser($user_object_id);
         foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
             if (is_null($object->address)) {
+                $text = "<b>Отбой тревоги</b> \n" .
+                    "Номер обьекта: " . $object_id . "\n" .
+                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Тип: " . $object->type;
                 $api->response(
-                    $api->builder(
-                        "<b>Отбой тревоги</b> \n" .
-                        "Номер обьекта: " . $object_id . "\n" .
-                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
-                        "Тип: " . $object->type,
-                        $user->telegram_id),
+                    $api->builder($text, $user->telegram_id),
                 );
+                $api->broadcast($text);
             } else {
+                $text = "<b>Отбой тревоги</b> \n" .
+                    "Номер обьекта: " . $object_id . "\n" .
+                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Адресс: " . $object->address . "\n" .
+                    "Тип: " . $object->type;
                 $api->response(
-                    $api->builder(
-                        "<b>Отбой тревоги</b> \n" .
-                        "Номер обьекта: " . $object_id . "\n" .
-                        "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
-                        "Адресс: " . $object->address . "\n" .
-                        "Тип: " . $object->type,
-                        $user->telegram_id),
+                    $api->builder($text, $user->telegram_id),
                 );
+                $api->broadcast($text);
             }
         }
     }
