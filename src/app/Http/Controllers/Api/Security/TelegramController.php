@@ -164,7 +164,7 @@ class TelegramController extends Controller
                         } elseif ($data[0] == 'close') {
                             Log::info('Trying to close');
                             try {
-                                $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
+                                $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
                                 Alarm::query()->where('alarm_id', '=', $alarm->id)->update([
                                     'state' => 'close'
@@ -182,8 +182,8 @@ class TelegramController extends Controller
                         } elseif ($data[0] == 'ack') {
                             Log::info('Trying to ack');
                             try {
-                                $alarm = Alarm::query()->where('id', '=', explode(' ', $callback['data'])[1])->firstOrFail();
-                                Ack::sendAck($alarm->alarm_id, $user->id);
+                                $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
+                                Ack::sendAck($alarm->id, $user->id);
                                 $this->response(
                                     $this->builder('Сигнал реагирования отправлен', $chatId),
                                 );
