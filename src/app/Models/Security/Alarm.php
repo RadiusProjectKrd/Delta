@@ -13,11 +13,16 @@ class Alarm extends Model
 
     protected $fillable = [
         'object_id',
+        'from',
         'state'
     ];
 
     public static function getAlarm($id) {
         return self::query()->where('id', '=', $id)->first();
+    }
+
+    public static function getFromUser($user) {
+        return self::query()->where('from', '=', $user)->first();
     }
 
     public static function openAlarm($alarm_id)
@@ -26,13 +31,12 @@ class Alarm extends Model
         $alarm = self::getAlarm($alarm_id);
         $object_id = $alarm->object_id;
         $object = Objects::getObject($object_id);
-        $user_object_id = UserObjects::searchUserByObject($object_id)->user_id;
-        $user_object = UnderSecurity::getUnderSecurityUser($user_object_id);
+        $from_user = UnderSecurity::getUnderSecurityUser($alarm->from);
         foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
             if (is_null($object->address)) {
                 $text = "<b>ТРЕВОГА</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
-                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Тип: " . $object->type;
                 $api->response(
                     $api->withButtons(
@@ -46,7 +50,7 @@ class Alarm extends Model
             } else {
                 $text = "<b>ТРЕВОГА</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
-                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Адресс: " . $object->address . "\n" .
                     "Тип: " . $object->type;
                 $api->response(
@@ -68,13 +72,12 @@ class Alarm extends Model
         $alarm = self::getAlarm($alarm_id);
         $object_id = $alarm->object_id;
         $object = Objects::getObject($object_id);
-        $user_object_id = UserObjects::searchUserByObject($object_id)->user_id;
-        $user_object = UnderSecurity::getUnderSecurityUser($user_object_id);
+        $from_user = UnderSecurity::getUnderSecurityUser($alarm->from);
         foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
             if (is_null($object->address)) {
                 $text = "<b>Отбой тревоги</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
-                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Тип: " . $object->type;
                 $api->response(
                     $api->builder($text, $user->telegram_id),
@@ -83,7 +86,7 @@ class Alarm extends Model
             } else {
                 $text = "<b>Отбой тревоги</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
-                    "Пользователь: " . $user_object->first_name . " " . $user_object->last_name . "\n" .
+                    "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Адресс: " . $object->address . "\n" .
                     "Тип: " . $object->type;
                 $api->response(
