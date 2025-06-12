@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Api\Security;
 
 use App\Http\Controllers\Controller;
-use app\Models\Security\Alarm;
-use app\Models\Security\Objects;
-use app\Models\Security\UserObjects;
+use App\Models\Security\Ack;
+use App\Models\Security\Alarm;
+use App\Models\Security\Objects;
+use App\Models\Security\UnderSecurity;
+use App\Models\Security\UserObjects;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 
 class TelegramController extends Controller
 {
@@ -20,37 +21,16 @@ class TelegramController extends Controller
 
     public function __construct()
     {
-        $this->token = config('app.telegram_token');
-        $this->broadcast_channel = config('app.telegram_broadcast_channel');
-        $this->broadcast_thread = config('app.telegram_broadcast_thread');
+        $this->token = config('telegram.security.token');
+        $this->broadcast_channel = config('telegram.security.broadcast_channel');
+        $this->broadcast_thread = config('telegram.security.broadcast_thread');
     }
 
-    public function webhook(): void
-    {
-        Log::info(Http::get('https://api.telegram.org/bot' . $this->token . '/setWebhook', [
-            'url' => 'imperator.ultimatex.tech/api/bot/security'
-        ]));
-    }
-
-    public function broadcast(Request $request): void
-    {
-        $data = $this->builder($request->input('text'), $this->broadcast_channel);
-        $data['reply_to_message_id'] = $this->broadcast_thread;
-        $this->response($data);
-    }
-
-    public function test_broadcast($text): void
+    public function broadcast($text): void
     {
         $data = $this->builder($text, $this->broadcast_channel);
         $data['reply_to_message_id'] = $this->broadcast_thread;
         $this->response($data);
-    }
-
-    public function test_message($text, $chatId)
-    {
-        $this->response(
-            $this->builder($text, $chatId)
-        );
     }
 
     public function handler(Request $request): void
@@ -67,7 +47,7 @@ class TelegramController extends Controller
             Log::info('New Group Message');
         }
 
-        $user = User::where('telegram_id', $chatId)->first();
+        $user = UnderSecurity::where('telegram_id', $chatId)->first();
         if ($user) {
             if ($callback != null) {
                 Log::info('Callback Proccessing');
@@ -90,7 +70,7 @@ class TelegramController extends Controller
                             $this->withButtons(
                                 $this->builder(
                                     "ID: " . $user->id . "\n" .
-                                    "Имя: " . $user->name . "\n",
+                                    "ФИО: " . $user->first_name . " " . $user->last_name . "\n",
                                     $chatId),
                                 [
                                     ['text' => 'На главную', 'command' => 'menu'],
@@ -100,29 +80,38 @@ class TelegramController extends Controller
                         break;
 
                     case 'objects':
-                        $objects = UserObjects::getAll($user);
+                        $objects = UserObjects::getAll($user->id);
                         if (count($objects) > 0) {
                             $this->response(
-                                $this->builder('Ваши документы:', $chatId)
+                                $this->builder('Ваши обьекты:', $chatId)
                             );
 
-                            foreach ($objects as $object) {
+                            foreach ($objects as $user_object) {
+                                $object = Objects::getObject($user_object->object_id);
                                 if (is_null($object->address)) {
                                     $this->response(
-                                        $this->builder(
-                                            "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
-                                            "<b>Название:</b> " . $object->name . "\n" .
-                                            "<b>Тип:</b> " . $object->type . "\n",
-                                            $chatId)
+                                        $this->withButtons(
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                            ])
                                     );
                                 } else {
                                     $this->response(
-                                        $this->builder(
-                                            "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
-                                            "<b>Название:</b> " . $object->name . "\n" .
-                                            "<b>Адресс:</b> " . $object->address . "\n" .
-                                            "<b>Тип:</b> " . $object->type . "\n",
-                                            $chatId)
+                                        $this->withButtons(
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Адресс:</b> " . $object->address . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                            ])
                                     );
                                 }
                             }
@@ -134,26 +123,84 @@ class TelegramController extends Controller
                         break;
 
                     default:
-                        if (strpos('alarm ', $text)) {
+                        $data = explode(' ', $callback['data']);
+                        Log::info(json_encode(['payload' => $data]));
+                        if ($data[0] == 'alarm') {
+                            Log::info('Trying to alarm');
                             try {
-                                $object_id = UserObjects::getOne($user, explode(' ', $text)[1]);
-                                $object = Objects::getObject($object_id);
-                                $alarm = Alarm::query()->create([
-                                    'object_id' => $object_id,
-                                    'state' => 'open'
-                                ]);
-                                Alarm::openAlarm($alarm->id);
-                                $this->response(
-                                    $this->withButtons(
-                                        $this->builder('Активирована тревога по обьекту ' . $object_id . '!', $chatId),
-                                        [
-                                            ['text' => 'Заркыть тревогу', 'command' => 'close alarm ' . $alarm->id]
-                                        ]
-                                    )
-                                );
+                                $object_id = UserObjects::getOne($user->id, explode(' ', $callback['data'])[1]);
+                                if(Alarm::checkIsOpen($object_id->object_id)) {
+                                    $this->response(
+                                        $this->builder('По данному обьекту уже вызвана тревога', $chatId)
+                                    );
+                                } else {
+                                    $alarm = Alarm::query()->create([
+                                        'object_id' => $object_id->object_id,
+                                        'state' => 'open',
+                                        'from' => $user->id
+                                    ]);
+                                    Alarm::openAlarm($alarm->id);
+                                    $this->response(
+                                        $this->withButtons(
+                                            $this->builder('Активирована тревога по обьекту ' . $object_id->object_id . '!', $chatId),
+                                            [
+                                                ['text' => 'Заркыть тревогу', 'command' => 'close ' . $alarm->id]
+                                            ]
+                                        )
+                                    );
+                                }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Обьект не найден', $chatId)
+                                );
+                            }
+                        } elseif ($data[0] == 'close') {
+                            Log::info('Trying to close');
+                            try {
+                                $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
+                                if($alarm->state == 'close') {
+                                    $this->response(
+                                        $this->builder('Тревога с этим номером уже закрыта!', $chatId)
+                                    );
+                                } else {
+                                    $object = Objects::getObject($alarm->object_id);
+                                    Alarm::query()->where('id', '=', $alarm->id)->update([
+                                        'state' => 'close'
+                                    ]);
+                                    Alarm::closeAlarm($alarm->id);
+                                    $this->response(
+                                        $this->builder('Тревога по обьекту ' . $object->object_id . ' закрыта', $chatId),
+                                    );
+                                }
+                            } catch (ModelNotFoundException $e) {
+                                $this->response(
+                                    $this->builder('Тревога не найдена', $chatId)
+                                );
+                            }
+
+                        } elseif ($data[0] == 'ack') {
+                            Log::info('Trying to ack');
+                            try {
+                                $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
+                                if($alarm->state == 'close') {
+                                    $this->response(
+                                        $this->builder('Тревога с этим номером уже закрыта!', $chatId)
+                                    );
+                                } else {
+                                    if (Ack::checkAlreayAcked($alarm->id, $user->id)) {
+                                        $this->response(
+                                            $this->builder('Вы уже реагировали на эту тревогу', $chatId)
+                                        );
+                                    } else {
+                                        Ack::sendAck($alarm->id, $user->id);
+                                        $this->response(
+                                            $this->builder('Сигнал реагирования отправлен', $chatId),
+                                        );
+                                    }
+                                }
+                            } catch (ModelNotFoundException $e) {
+                                $this->response(
+                                    $this->builder('Тревога не найдена', $chatId)
                                 );
                             }
                         } else {

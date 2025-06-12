@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Models\Security;
+namespace App\Models\Security;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,6 +22,6 @@ class UnderSecurity extends Model
     }
 
     public static function getUnderSecurityUser($id) {
-        return self::query()->where('user_id', '=', $id)->first();
+        return self::query()->where('id', '=', $id)->first();
     }
 }
