@@ -16,6 +16,14 @@ class Ack extends Model
         'user_id'
     ];
 
+    public static function checkAlreayAcked($alarm, $user) {
+        if(self::query()->where('alarm_id', '=', $alarm)->where('user_id', '=', $user)->count() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static function sendAck($alarm_id, $user_id) {
         self::query()->create([
             'user_id' => $user_id,

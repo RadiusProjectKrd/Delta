@@ -129,19 +129,25 @@ class TelegramController extends Controller
                             Log::info('Trying to alarm');
                             try {
                                 $object_id = UserObjects::getOne($user->id, explode(' ', $callback['data'])[1]);
-                                $alarm = Alarm::query()->create([
-                                    'object_id' => $object_id->object_id,
-                                    'state' => 'open'
-                                ]);
-                                Alarm::openAlarm($alarm->id);
-                                $this->response(
-                                    $this->withButtons(
-                                        $this->builder('Активирована тревога по обьекту ' . $object_id->object_id . '!', $chatId),
-                                        [
-                                            ['text' => 'Заркыть тревогу', 'command' => 'close ' . $alarm->id]
-                                        ]
-                                    )
-                                );
+                                if(Alarm::checkIsOpen($object_id->object_id)) {
+                                    $this->response(
+                                        $this->builder('По данному обьекту уже вызвана тревога', $chatId)
+                                    );
+                                } else {
+                                    $alarm = Alarm::query()->create([
+                                        'object_id' => $object_id->object_id,
+                                        'state' => 'open'
+                                    ]);
+                                    Alarm::openAlarm($alarm->id);
+                                    $this->response(
+                                        $this->withButtons(
+                                            $this->builder('Активирована тревога по обьекту ' . $object_id->object_id . '!', $chatId),
+                                            [
+                                                ['text' => 'Заркыть тревогу', 'command' => 'close ' . $alarm->id]
+                                            ]
+                                        )
+                                    );
+                                }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Обьект не найден', $chatId)
@@ -151,14 +157,20 @@ class TelegramController extends Controller
                             Log::info('Trying to close');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
-                                $object = Objects::getObject($alarm->object_id);
-                                Alarm::query()->where('id', '=', $alarm->id)->update([
-                                    'state' => 'close'
-                                ]);
-                                Alarm::closeAlarm($alarm->id);
-                                $this->response(
-                                    $this->builder('Тревога по обьекту ' . $object->object_id . ' закрыта', $chatId),
-                                );
+                                if($alarm->state == 'close') {
+                                    $this->response(
+                                        $this->builder('Тревога с этим номером уже закрыта!', $chatId)
+                                    );
+                                } else {
+                                    $object = Objects::getObject($alarm->object_id);
+                                    Alarm::query()->where('id', '=', $alarm->id)->update([
+                                        'state' => 'close'
+                                    ]);
+                                    Alarm::closeAlarm($alarm->id);
+                                    $this->response(
+                                        $this->builder('Тревога по обьекту ' . $object->object_id . ' закрыта', $chatId),
+                                    );
+                                }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Тревога не найдена', $chatId)
@@ -169,10 +181,16 @@ class TelegramController extends Controller
                             Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
-                                Ack::sendAck($alarm->id, $user->id);
-                                $this->response(
-                                    $this->builder('Сигнал реагирования отправлен', $chatId),
-                                );
+                                if(Ack::checkAlreayAcked($alarm->id, $user->id)) {
+                                    $this->response(
+                                        $this->builder('Вы уже реагировали на эту тревогу', $chatId)
+                                    );
+                                } else {
+                                    Ack::sendAck($alarm->id, $user->id);
+                                    $this->response(
+                                        $this->builder('Сигнал реагирования отправлен', $chatId),
+                                    );
+                                }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Тревога не найдена', $chatId)

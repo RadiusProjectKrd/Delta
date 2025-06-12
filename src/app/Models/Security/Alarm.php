@@ -25,6 +25,14 @@ class Alarm extends Model
         return self::query()->where('from', '=', $user)->first();
     }
 
+    public static function checkIsOpen($object) {
+        if(self::query()->where('object_id', '=', $object)->where('state', '=', 'open')->count() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static function openAlarm($alarm_id)
     {
         $api = new TelegramController();
