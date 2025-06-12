@@ -181,15 +181,21 @@ class TelegramController extends Controller
                             Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
-                                if(Ack::checkAlreayAcked($alarm->id, $user->id)) {
+                                if($alarm->state == 'close') {
                                     $this->response(
-                                        $this->builder('Вы уже реагировали на эту тревогу', $chatId)
+                                        $this->builder('Тревога с этим номером уже закрыта!', $chatId)
                                     );
                                 } else {
-                                    Ack::sendAck($alarm->id, $user->id);
-                                    $this->response(
-                                        $this->builder('Сигнал реагирования отправлен', $chatId),
-                                    );
+                                    if (Ack::checkAlreayAcked($alarm->id, $user->id)) {
+                                        $this->response(
+                                            $this->builder('Вы уже реагировали на эту тревогу', $chatId)
+                                        );
+                                    } else {
+                                        Ack::sendAck($alarm->id, $user->id);
+                                        $this->response(
+                                            $this->builder('Сигнал реагирования отправлен', $chatId),
+                                        );
+                                    }
                                 }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
