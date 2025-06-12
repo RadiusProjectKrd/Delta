@@ -136,7 +136,8 @@ class TelegramController extends Controller
                                 } else {
                                     $alarm = Alarm::query()->create([
                                         'object_id' => $object_id->object_id,
-                                        'state' => 'open'
+                                        'state' => 'open',
+                                        'from' => $user->id
                                     ]);
                                     Alarm::openAlarm($alarm->id);
                                     $this->response(
