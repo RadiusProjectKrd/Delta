@@ -166,7 +166,7 @@ class TelegramController extends Controller
                             try {
                                 $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
                                 $object = Objects::getObject($alarm->object_id);
-                                Alarm::query()->where('alarm_id', '=', $alarm->id)->update([
+                                Alarm::query()->where('id', '=', $alarm->id)->update([
                                     'state' => 'close'
                                 ]);
                                 Alarm::closeAlarm($alarm->id);
