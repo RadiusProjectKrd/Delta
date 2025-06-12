@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('object_id');
             $table->string('name');
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->string('type');
         });
     }
