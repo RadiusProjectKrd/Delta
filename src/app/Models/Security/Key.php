@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Key extends Model
 {
+    protected $table = 'security_key';
+
     protected $fillable = [
         'object_id',
         'user_id',
