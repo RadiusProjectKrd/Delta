@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('security_alarm', function (Blueprint $table) {
+        Schema::create('security_key', function (Blueprint $table) {
             $table->id();
             $table->integer('object_id');
-            $table->string('state');
-            $table->integer('from');
+            $table->integer('user_id');
+            $table->string('key');
             $table->string('desc');
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('security_alarm');
+        Schema::dropIfExists('security_key');
     }
 };
