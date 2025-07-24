@@ -70,8 +70,8 @@ class Alarm extends Model
                     )
                 );
             }
-            $api->broadcast($text);
         }
+        $api->broadcast($text);
     }
 
     public static function closeAlarm($alarm_id)
@@ -90,7 +90,6 @@ class Alarm extends Model
                 $api->response(
                     $api->builder($text, $user->telegram_id),
                 );
-                $api->broadcast($text);
             } else {
                 $text = "<b>Отбой тревоги</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
@@ -100,9 +99,9 @@ class Alarm extends Model
                 $api->response(
                     $api->builder($text, $user->telegram_id),
                 );
-                $api->broadcast($text);
             }
         }
+        $api->broadcast($text);
     }
 
     /**
@@ -128,7 +127,7 @@ class Alarm extends Model
             $api->response(
                 $api->builder($text, $user->telegram_id),
             );
-            $api->broadcast($text);
         }
+        $api->broadcast($text);
     }
 }
