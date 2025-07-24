@@ -46,7 +46,8 @@ class Alarm extends Model
                 $text = "<b>ТРЕВОГА</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
-                    "Тип: " . $object->type;
+                    "Тип: " . $object->type . "\n".
+                    "Описание: ".$alarm->desc;
                 $api->response(
                     $api->withButtons(
                         $api->builder($text, $user->telegram_id),
@@ -60,7 +61,8 @@ class Alarm extends Model
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Адресс: " . $object->address . "\n" .
-                    "Тип: " . $object->type;
+                    "Тип: " . $object->type."\n".
+                    "Описание: ".$alarm->desc;
                 $api->response(
                     $api->withButtons(
                         $api->builder($text, $user->telegram_id),
@@ -86,7 +88,8 @@ class Alarm extends Model
                 $text = "<b>Отбой тревоги</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
-                    "Тип: " . $object->type;
+                    "Тип: " . $object->type . "\n".
+                    "Описание: ".$alarm->desc;
                 $api->response(
                     $api->builder($text, $user->telegram_id),
                 );
@@ -95,7 +98,8 @@ class Alarm extends Model
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                     "Адресс: " . $object->address . "\n" .
-                    "Тип: " . $object->type;
+                    "Тип: " . $object->type."\n".
+                    "Описание: ".$alarm->desc;
                 $api->response(
                     $api->builder($text, $user->telegram_id),
                 );
@@ -123,7 +127,8 @@ class Alarm extends Model
                 "Номер обьекта: " . $object_id . "\n" .
                 "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
                 "Локация: ". $link ." \n" .
-                "Тип: " . $object->type;
+                "Тип: " . $object->type . "\n".
+                "Описание: ".$alarm->desc;
             $api->response(
                 $api->builder($text, $user->telegram_id),
             );

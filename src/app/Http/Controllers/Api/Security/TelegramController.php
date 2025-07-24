@@ -147,7 +147,8 @@ class TelegramController extends Controller
                                     $alarm = Alarm::query()->create([
                                         'object_id' => $object_id->object_id,
                                         'state' => 'open',
-                                        'from' => $user->id
+                                        'from' => $user->id,
+                                        'desc' => 'Тревога из приложения в Telegram'
                                     ]);
                                     Alarm::openAlarm($alarm->id);
                                     $this->response(
