@@ -158,7 +158,7 @@ class TelegramController extends Controller
                                             ]
                                         )
                                     );
-                                    if(is_null(Objects::getObject($object_id)->address)) {
+                                    if(is_null(Objects::getObject($object_id->object_id)->address)) {
                                         $this->sendLocationRequest($chatId);
                                     }
                                 }
