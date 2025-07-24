@@ -14,7 +14,8 @@ class Alarm extends Model
     protected $fillable = [
         'object_id',
         'from',
-        'state'
+        'state',
+        'desc'
     ];
 
     public static function getAlarm($id) {
@@ -54,7 +55,6 @@ class Alarm extends Model
                         ],
                     )
                 );
-                $api->broadcast($text);
             } else {
                 $text = "<b>ТРЕВОГА</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
@@ -69,8 +69,8 @@ class Alarm extends Model
                         ],
                     )
                 );
-                $api->broadcast($text);
             }
+            $api->broadcast($text);
         }
     }
 
@@ -102,6 +102,33 @@ class Alarm extends Model
                 );
                 $api->broadcast($text);
             }
+        }
+    }
+
+    /**
+     * @param $alarm_id
+     * @param $lat, Latitude
+     * @param $lon, Longitude
+     * @param $zoom
+     * @return void
+     */
+    public static function sendLoc($alarm_id, $lat, $lon, $zoom = '16') {
+        $api = new TelegramController();
+        $alarm = self::getAlarm($alarm_id);
+        $object_id = $alarm->object_id;
+        $object = Objects::getObject($object_id);
+        $from_user = UnderSecurity::getUnderSecurityUser($alarm->from);
+        $link = "https://yandex.ru/maps/?ll=$lon,$lat&z=$zoom";
+        foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
+            $text = "<b>Получены координаты тревоги</b> \n".
+                "Номер обьекта: " . $object_id . "\n" .
+                "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
+                "Локация: ". $link ." \n" .
+                "Тип: " . $object->type;
+            $api->response(
+                $api->builder($text, $user->telegram_id),
+            );
+            $api->broadcast($text);
         }
     }
 }

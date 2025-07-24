@@ -45,9 +45,19 @@ class TelegramController extends Controller
             $chatId = $request->input('message.from.id');
         } elseif ($request->input('my_chat_member') != null) {
             Log::info('New Group Message');
+        } elseif($request->input('message.location')) {
+            $chatId = $request->input('message.from.id');
+            $user = UnderSecurity::query()->where('telegram_id', $chatId)->first();
+            $alarms = Alarm::query()->where('user_id', '=', $user->id)->where('state', '=', 'open')->get();
+            foreach($alarms as $alarm) {
+                $object = Objects::getObject($alarm->object_id);
+                if(is_null($object->address)) {
+                    Alarm::sendLoc($alarm->id, $request->input('message.location.latitude'), $request->input('message.location.longitude'));
+                };
+            }
         }
 
-        $user = UnderSecurity::where('telegram_id', $chatId)->first();
+        $user = UnderSecurity::query()->where('telegram_id', $chatId)->first();
         if ($user) {
             if ($callback != null) {
                 Log::info('Callback Proccessing');
@@ -148,6 +158,9 @@ class TelegramController extends Controller
                                             ]
                                         )
                                     );
+                                    if(is_null(Objects::getObject($object_id)->address)) {
+                                        $this->sendLocationRequest($chatId);
+                                    }
                                 }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
@@ -259,6 +272,29 @@ class TelegramController extends Controller
         }
         $data['reply_markup'] = $keyboard;
         return $data;
+    }
+
+    public function sendLocationRequest($chatId)
+    {
+        $data = [
+            'chat_id' => $chatId,
+            'text' => 'Пожалуйста, отправьте свою локацию:',
+            'reply_markup' => json_encode([
+                'keyboard' => [
+                    [
+                        [
+                            'text' => '📍 Отправить локацию',
+                            'request_location' => true
+                        ]
+                    ]
+                ],
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ])
+        ];
+
+        // Отправка через Telegram Bot API
+        $this->response($data);
     }
 
     public function sendAttachment(int $chatId, $attachment, string $name): void

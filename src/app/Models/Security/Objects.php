@@ -14,7 +14,8 @@ class Objects extends Model
         'object_id',
         'name',
         'address',
-        'type'
+        'type',
+        'state'
     ];
 
     public static function getObject($object_id) {
