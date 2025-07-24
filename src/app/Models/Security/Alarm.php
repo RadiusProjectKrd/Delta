@@ -117,7 +117,7 @@ class Alarm extends Model
         $object_id = $alarm->object_id;
         $object = Objects::getObject($object_id);
         $from_user = UnderSecurity::getUnderSecurityUser($alarm->from);
-        $link = "https://yandex.ru/maps/?ll=$lon,$lat&z=$zoom";
+        $link = "https://yandex.ru/maps/?pt=".$lon.",".$lat."&z=".$zoom."&l=map";
         foreach (UnderSecurity::getUnderSecurityUsers() as $user) {
             $text = "<b>Получены координаты тревоги</b> \n".
                 "Номер обьекта: " . $object_id . "\n" .
