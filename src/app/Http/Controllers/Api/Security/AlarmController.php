@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Http\Controllers\Api\Security;
+namespace App\Http\Controllers\Api\Security;
 
 use App\Http\Controllers\Controller;
 use App\Models\Security\Key;
