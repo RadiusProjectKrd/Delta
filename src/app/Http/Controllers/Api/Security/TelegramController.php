@@ -48,7 +48,7 @@ class TelegramController extends Controller
         } elseif($request->input('message.location')) {
             $chatId = $request->input('message.from.id');
             $user = UnderSecurity::query()->where('telegram_id', $chatId)->first();
-            $alarms = Alarm::query()->where('user_id', '=', $user->id)->where('state', '=', 'open')->get();
+            $alarms = Alarm::query()->where('from', '=', $user->id)->where('state', '=', 'open')->get();
             foreach($alarms as $alarm) {
                 $object = Objects::getObject($alarm->object_id);
                 if(is_null($object->address)) {
