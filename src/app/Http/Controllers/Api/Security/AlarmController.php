@@ -17,7 +17,7 @@ class AlarmController extends Controller
         Log::info('Trying to alarm');
         $api = new TelegramController();
         try {
-            $object_id = Key::query()->where('key', '=', $key)->firstOrFail()->object_id;
+            $object_id = Key::query()->where('key', '=', $key)->firstOrFail();
             $user = UnderSecurity::getUnderSecurityUser(Key::getByKey($key)->user_id);
             if(AlarmModel::checkIsOpen($object_id->object_id)) {
                 return response()->json(['success' => false, 'error' => 'По данному обьекту уже вызвана тревога'], 409);
