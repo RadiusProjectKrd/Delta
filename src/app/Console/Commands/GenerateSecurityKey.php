@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use app\Models\Security\Key;
+use App\Models\Security\Key;
 use App\Models\Security\Objects;
 use App\Models\Security\UnderSecurity;
 use Illuminate\Console\Command;

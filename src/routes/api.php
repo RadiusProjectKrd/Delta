@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\Play\Minecraft\PackageController;
 use App\Http\Controllers\Api\Play\Minecraft\ProductionController;
 use App\Http\Controllers\Api\Play\Minecraft\TelegramController as MinecraftTelegram;
 use App\Http\Controllers\Api\Security\TelegramController as SecurityTelegram;
-use app\Http\Controllers\Api\Security\AlarmController;
+use App\Http\Controllers\Api\Security\AlarmController;
 
 /*
 |--------------------------------------------------------------------------
