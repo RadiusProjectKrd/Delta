@@ -108,7 +108,7 @@ class TelegramController extends Controller
                                         case 1:
                                             $state = '🟢 Под охраной';
                                             break;
-                                        case 3:
+                                        case 2:
                                             $state = '🔘 КТС';
                                             break;
                                         default:
