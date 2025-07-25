@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Play\Minecraft\PackageController;
 use App\Http\Controllers\Api\Play\Minecraft\ProductionController;
 use App\Http\Controllers\Api\Play\Minecraft\TelegramController as MinecraftTelegram;
 use App\Http\Controllers\Api\Security\TelegramController as SecurityTelegram;
+use App\Http\Controllers\Api\Security\AlarmController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,8 @@ Route::get('/production/get/{name}', [ProductionController::class, 'get'])->midd
 Route::get('/package/download/{prod}', [PackageController::class, 'latest'])->middleware(['auth:sanctum']);
 Route::get('/package/download/{prod}/{build}', [PackageController::class, 'download'])->middleware(['auth:sanctum']);
 //Route::get('/package/create/{prod}/{ver}', [PackageController::class, 'create']);
+
+Route::get('/security/alarm/{key}', [AlarmController::class, 'open']);
 
 Route::any('/{path?}', function () {
     return response()->json(['success' => false, 'error' => 'Not found'], 404);

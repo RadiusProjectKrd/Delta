@@ -14,7 +14,7 @@ class UnderSecurity extends Model
         'user_id',
         'telegram_id',
         'first_name',
-        'last_name'
+        'last_name',
     ];
 
     public static function getUnderSecurityUsers() {

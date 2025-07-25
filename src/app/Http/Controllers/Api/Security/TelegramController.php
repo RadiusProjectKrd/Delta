@@ -45,9 +45,19 @@ class TelegramController extends Controller
             $chatId = $request->input('message.from.id');
         } elseif ($request->input('my_chat_member') != null) {
             Log::info('New Group Message');
+        } elseif($request->input('message.location')) {
+            $chatId = $request->input('message.from.id');
+            $user = UnderSecurity::query()->where('telegram_id', $chatId)->first();
+            $alarms = Alarm::query()->where('from', '=', $user->id)->where('state', '=', 'open')->get();
+            foreach($alarms as $alarm) {
+                $object = Objects::getObject($alarm->object_id);
+                if(is_null($object->address)) {
+                    Alarm::sendLoc($alarm->id, $request->input('message.location.latitude'), $request->input('message.location.longitude'));
+                };
+            }
         }
 
-        $user = UnderSecurity::where('telegram_id', $chatId)->first();
+        $user = UnderSecurity::query()->where('telegram_id', $chatId)->first();
         if ($user) {
             if ($callback != null) {
                 Log::info('Callback Proccessing');
@@ -88,16 +98,36 @@ class TelegramController extends Controller
 
                             foreach ($objects as $user_object) {
                                 $object = Objects::getObject($user_object->object_id);
+                                if(Alarm::checkIsOpen($object->id)) {
+                                    $state = '🔴 Тревога';
+                                } else {
+                                    $objectState = (int)$object->state;
+                                    switch ($objectState) {
+                                        case 0:
+                                            $state = '🔵 Не под охраной';
+                                            break;
+                                        case 1:
+                                            $state = '🟢 Под охраной';
+                                            break;
+                                        case 2:
+                                            $state = '🔘 КТС';
+                                            break;
+                                        default:
+                                            $state = '⬤ Неизветсно';
+                                    }
+                                }
                                 if (is_null($object->address)) {
                                     $this->response(
                                         $this->withButtons(
                                             $this->builder(
                                                 "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
                                                 "<b>Название:</b> " . $object->name . "\n" .
-                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                "<b>Тип:</b> " . $object->type . "\n".
+                                                "<b>Статус:</b> " .$state. "\n",
                                                 $chatId),
                                             [
-                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id],
+                                                ['text' => 'Изменить статус обьекта', 'command' => 'state '. $object->object_id]
                                             ])
                                     );
                                 } else {
@@ -107,10 +137,12 @@ class TelegramController extends Controller
                                                 "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
                                                 "<b>Название:</b> " . $object->name . "\n" .
                                                 "<b>Адресс:</b> " . $object->address . "\n" .
-                                                "<b>Тип:</b> " . $object->type . "\n",
+                                                "<b>Тип:</b> " . $object->type . "\n".
+                                                "<b>Статус:</b> " .$state. "\n",
                                                 $chatId),
                                             [
-                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id],
+                                                ['text' => 'Изменить статус обьекта', 'command' => 'state '. $object->object_id]
                                             ])
                                     );
                                 }
@@ -133,11 +165,16 @@ class TelegramController extends Controller
                                     $this->response(
                                         $this->builder('По данному обьекту уже вызвана тревога', $chatId)
                                     );
+                                } elseif(Objects::getObject($object_id->object_id)->state == 0) {
+                                    $this->response(
+                                        $this->builder('Тревога не возможна, обьект снят с охраны', $chatId)
+                                    );
                                 } else {
                                     $alarm = Alarm::query()->create([
                                         'object_id' => $object_id->object_id,
                                         'state' => 'open',
-                                        'from' => $user->id
+                                        'from' => $user->id,
+                                        'desc' => 'Тревога из приложения в Telegram'
                                     ]);
                                     Alarm::openAlarm($alarm->id);
                                     $this->response(
@@ -148,6 +185,9 @@ class TelegramController extends Controller
                                             ]
                                         )
                                     );
+                                    if(is_null(Objects::getObject($object_id->object_id)->address)) {
+                                        $this->sendLocationRequest($chatId);
+                                    }
                                 }
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
@@ -182,7 +222,7 @@ class TelegramController extends Controller
                             Log::info('Trying to ack');
                             try {
                                 $alarm = Alarm::query()->where('id', '=', $data[1])->firstOrFail();
-                                if($alarm->state == 'close') {
+                                if ($alarm->state == 'close') {
                                     $this->response(
                                         $this->builder('Тревога с этим номером уже закрыта!', $chatId)
                                     );
@@ -201,6 +241,43 @@ class TelegramController extends Controller
                             } catch (ModelNotFoundException $e) {
                                 $this->response(
                                     $this->builder('Тревога не найдена', $chatId)
+                                );
+                            }
+                        } elseif($data[0] == 'state') {
+                            $this->response(
+                                $this->withButtons(
+                                    $this->builder('Выберете статус для обьекта', $chatId),
+                                        [
+                                            ['text' => '🟢 Под охрану', 'command' => 'set_state '.$data[1].' 1'],
+                                            ['text' => '🔵 Снять с охраны', 'command' => 'set_state '.$data[1].' 0'],
+                                        ]
+                                )
+                            );
+                        } elseif($data[0] == 'set_state') {
+                            Log::info('Trying to update state');
+                            try {
+                                $object = Objects::query()->where('object_id', '=', $data[1])->firstOrFail();
+                                try {
+                                    $access = UserObjects::query()->where('user_id', $user->id)->where('object_id', '=', $data[1])->firstOrFail();
+                                    if(($object->type == 'КТС') or ($object->type == 'ПТК')) {
+                                        $this->response(
+                                            $this->builder('Нельзя менять статус для данного типа обьекта', $chatId)
+                                        );
+                                    } else {
+                                        Objects::query()->where('object_id', '=', $object->object_id)->update(['state' => $data[2]]);
+                                        $this->response(
+                                            $this->builder('Статус обьекта успешно изменен', $chatId)
+                                        );
+                                        Objects::changeState($object->object_id, $data[2], $user->id);
+                                    }
+                                } catch (ModelNotFoundException $e) {
+                                    $this->response(
+                                        $this->builder('Обьект вам не принадлежит', $chatId)
+                                    );
+                                }
+                            } catch (ModelNotFoundException $e) {
+                                $this->response(
+                                    $this->builder('Обьект не найден', $chatId)
                                 );
                             }
                         } else {
@@ -223,6 +300,7 @@ class TelegramController extends Controller
                                 ]
                             )
                         );
+                        $this->createKeyboard($chatId);
                         break;
                 }
             }
@@ -259,6 +337,49 @@ class TelegramController extends Controller
         }
         $data['reply_markup'] = $keyboard;
         return $data;
+    }
+
+    public function createKeyboard($chatId) {
+        $data = [
+            'chat_id' => $chatId,
+            'reply_markup' => json_encode([
+                'keyboard' => [
+                    [
+                        [
+                            'text' => '/start',
+                        ]
+                    ]
+                ],
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ])
+        ];
+
+        // Отправка через Telegram Bot API
+        $this->response($data);
+    }
+
+    public function sendLocationRequest($chatId)
+    {
+        $data = [
+            'chat_id' => $chatId,
+            'text' => 'Пожалуйста, отправьте свою локацию:',
+            'reply_markup' => json_encode([
+                'keyboard' => [
+                    [
+                        [
+                            'text' => '📍 Отправить локацию',
+                            'request_location' => true
+                        ]
+                    ]
+                ],
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ])
+        ];
+
+        // Отправка через Telegram Bot API
+        $this->response($data);
     }
 
     public function sendAttachment(int $chatId, $attachment, string $name): void
