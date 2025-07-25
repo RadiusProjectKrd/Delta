@@ -102,7 +102,7 @@ class TelegramController extends Controller
                                     $state = '🔴 Тревога';
                                 } else {
                                     switch ($object->state) {
-                                        case 0:
+                                        case "0":
                                             $state = '🔵 Не под охраной';
                                             break;
                                         case 1:
