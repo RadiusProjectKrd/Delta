@@ -140,7 +140,8 @@ class TelegramController extends Controller
                                                 "<b>Статус:</b> " .$state. "\n",
                                                 $chatId),
                                             [
-                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id]
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id],
+                                                ['text' => 'Изменить статус обьекта', 'command' => 'state '. $object->object_id]
                                             ])
                                     );
                                 }
