@@ -21,6 +21,8 @@ class AlarmController extends Controller
             $user = UnderSecurity::getUnderSecurityUser(Key::getByKey($key)->user_id);
             if(AlarmModel::checkIsOpen($object_id->object_id)) {
                 return response()->json(['success' => false, 'error' => 'По данному обьекту уже вызвана тревога'], 409);
+            } elseif(Objects::getObject($object_id->object_id)->state == 0) {
+                return response()->json(['success' => false, 'error' => 'Обьект не под охраной'], 400);
             } else {
                 $alarm = AlarmModel::query()->create([
                     'object_id' => $object_id->object_id,
