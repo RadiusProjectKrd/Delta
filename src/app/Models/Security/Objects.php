@@ -32,7 +32,7 @@ class Objects extends Model
                 $text = "<b>Обьект ".$object_id." снят с охраны</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
-                    "Тип: " . $object->type . "\n".
+                    "Тип: " . $object->type;
                 $api->response(
                         $api->builder($text, $user->telegram_id),
                 );
@@ -40,7 +40,7 @@ class Objects extends Model
                 $text = "<b>Обьект ".$object_id." поставлен на охрану</b> \n" .
                     "Номер обьекта: " . $object_id . "\n" .
                     "Пользователь: " . $from_user->first_name . " " . $from_user->last_name . "\n" .
-                    "Тип: " . $object->type . "\n".
+                    "Тип: " . $object->type;
                     $api->response(
                         $api->builder($text, $user->telegram_id),
                     );
