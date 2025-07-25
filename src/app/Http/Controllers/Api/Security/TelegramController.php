@@ -165,6 +165,10 @@ class TelegramController extends Controller
                                     $this->response(
                                         $this->builder('По данному обьекту уже вызвана тревога', $chatId)
                                     );
+                                } elseif(Objects::getObject($object_id->object_id)->state == 0) {
+                                    $this->response(
+                                        $this->builder('Тревога не возможна, обьект снят с охраны', $chatId)
+                                    );
                                 } else {
                                     $alarm = Alarm::query()->create([
                                         'object_id' => $object_id->object_id,
