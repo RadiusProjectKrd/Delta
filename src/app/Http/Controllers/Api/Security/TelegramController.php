@@ -253,7 +253,7 @@ class TelegramController extends Controller
                             try {
                                 $object = Objects::query()->where('object_id', '=', $data[1])->firstOrFail();
                                 try {
-                                    $access = UserObjects::getOne($user->id, $object->id);
+                                    $access = UserObjects::query()->where('user_id', $user->id)->where('object_id', '=', $data[1])->firstOrFail();
                                     if(($object->type == 'КТС') or ($object->type == 'ПТК')) {
                                         $this->response(
                                             $this->builder('Нельзя менять статус для данного типа обьекта', $chatId)
