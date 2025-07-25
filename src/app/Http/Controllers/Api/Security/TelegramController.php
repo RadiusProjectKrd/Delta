@@ -264,6 +264,7 @@ class TelegramController extends Controller
                                         $this->response(
                                             $this->builder('Статус обьекта успешно изменен', $chatId)
                                         );
+                                        Objects::changeState($object->object_id, $data[2], $user->id);
                                     }
                                 } catch (ModelNotFoundException $e) {
                                     $this->response(
