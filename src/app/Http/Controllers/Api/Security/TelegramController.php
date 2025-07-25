@@ -260,7 +260,7 @@ class TelegramController extends Controller
                                             $this->builder('Нельзя менять статус для данного типа обьекта', $chatId)
                                         );
                                     } else {
-                                        Objects::query()->where('object_id', '=', $object->id)->update(['state' => $data[2]]);
+                                        Objects::query()->where('object_id', '=', $object->object_id)->update(['state' => $data[2]]);
                                         $this->response(
                                             $this->builder('Статус обьекта успешно изменен', $chatId)
                                         );
