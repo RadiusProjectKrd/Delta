@@ -101,8 +101,9 @@ class TelegramController extends Controller
                                 if(Alarm::checkIsOpen($object->id)) {
                                     $state = '🔴 Тревога';
                                 } else {
-                                    switch ($object->state) {
-                                        case "0":
+                                    $objectState = (int)$object->state;
+                                    switch ($objectState) {
+                                        case 0:
                                             $state = '🔵 Не под охраной';
                                             break;
                                         case 1:
