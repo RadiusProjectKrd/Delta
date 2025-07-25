@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('address')->nullable();
             $table->string('type');
+            $table->integer('state')->nullable(false)->default(3);
         });
     }
 
