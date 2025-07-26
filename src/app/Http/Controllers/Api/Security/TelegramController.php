@@ -302,6 +302,94 @@ class TelegramController extends Controller
                         );
                         $this->createKeyboard($chatId);
                         break;
+                    case '/menu':
+                        $this->response(
+                            $this->withButtons(
+                                $this->builder("Меню", $chatId),
+                                [
+                                    ['text' => 'Аккаунт', 'command' => 'me'],
+                                    ['text' => 'Обьекты', 'command' => 'objects'],
+                                ]
+                            )
+                        );
+                        break;
+                    case '/me':
+                        $this->response(
+                            $this->withButtons(
+                                $this->builder(
+                                    "ID: " . $user->id . "\n" .
+                                    "ФИО: " . $user->first_name . " " . $user->last_name . "\n",
+                                    $chatId),
+                                [
+                                    ['text' => 'На главную', 'command' => 'menu'],
+                                ]
+                            ),
+                        );
+                        break;
+                    case '/objects':
+                        $objects = UserObjects::getAll($user->id);
+                        if (count($objects) > 0) {
+                            $this->response(
+                                $this->builder('Ваши обьекты:', $chatId)
+                            );
+
+                            foreach ($objects as $user_object) {
+                                $object = Objects::getObject($user_object->object_id);
+                                if(Alarm::checkIsOpen($object->id)) {
+                                    $state = '🔴 Тревога';
+                                } else {
+                                    $objectState = (int)$object->state;
+                                    switch ($objectState) {
+                                        case 0:
+                                            $state = '🔵 Не под охраной';
+                                            break;
+                                        case 1:
+                                            $state = '🟢 Под охраной';
+                                            break;
+                                        case 2:
+                                            $state = '🔘 КТС';
+                                            break;
+                                        default:
+                                            $state = '⬤ Неизветсно';
+                                    }
+                                }
+                                if (is_null($object->address)) {
+                                    $this->response(
+                                        $this->withButtons(
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n".
+                                                "<b>Статус:</b> " .$state. "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id],
+                                                ['text' => 'Изменить статус обьекта', 'command' => 'state '. $object->object_id]
+                                            ])
+                                    );
+                                } else {
+                                    $this->response(
+                                        $this->withButtons(
+                                            $this->builder(
+                                                "<b>Номер обьекта:</b> " . $object->object_id . "\n" .
+                                                "<b>Название:</b> " . $object->name . "\n" .
+                                                "<b>Адресс:</b> " . $object->address . "\n" .
+                                                "<b>Тип:</b> " . $object->type . "\n".
+                                                "<b>Статус:</b> " .$state. "\n",
+                                                $chatId),
+                                            [
+                                                ['text' => 'Отправить тревогу', 'command' => 'alarm ' . $object->object_id],
+                                                ['text' => 'Изменить статус обьекта', 'command' => 'state '. $object->object_id]
+                                            ])
+                                    );
+                                }
+                            }
+                        } else {
+                            $this->response(
+                                $this->builder('У вас нет обьектов', $chatId)
+                            );
+                        }
+                        break;
                 }
             }
         } else {
@@ -342,16 +430,17 @@ class TelegramController extends Controller
     public function createKeyboard($chatId) {
         $data = [
             'chat_id' => $chatId,
+            'text' => 'Меню',
             'reply_markup' => json_encode([
                 'keyboard' => [
                     [
-                        [
-                            'text' => '/start',
-                        ]
+                        ['text' => '/start'],
+                        ['text' => '/menu'],
+                        ['text' => '/me'],
+                        ['text' => '/objects']
                     ]
                 ],
                 'resize_keyboard' => true,
-                'one_time_keyboard' => true
             ])
         ];
 
