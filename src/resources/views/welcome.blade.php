@@ -163,27 +163,65 @@
         @media (max-width: 600px) {
             .menu-toggle {
                 display: block;
+                cursor: pointer;
+            }
+
+            header {
+                flex-direction: column; /* Строим header в колонку */
+                align-items: stretch;
+            }
+
+            /* Первая строка: логотип, название и бургер */
+            .header-top {
+                display: flex;
+                justify-content: space-between; /* логотип+название слева, бургер справа */
+                align-items: center;
+                width: 100%;
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+            }
+
+            nav {
+                width: 100%;
+                margin-top: 0.5rem;
             }
 
             nav ul {
+                display: flex;
                 flex-direction: column;
-                position: absolute;
-                top: 100%;
-                right: 0;
+                width: 100%;
                 background-color: #1e1e1e;
-                width: 200px;
-                max-height: 0;
                 overflow: hidden;
-                border-radius: 10px;
+                max-height: 0;
+                opacity: 0;
+                border: none;
+                box-shadow: none;
+                transition: max-height 0.3s ease, opacity 0.3s ease, border 0s linear 0.3s, box-shadow 0s linear 0.3s;
             }
 
             nav ul.show {
                 max-height: 500px;
+                opacity: 1;
+                border: 2px solid var(--neon-color);
+                box-shadow: 0 0 15px var(--neon-color);
+                transition: max-height 0.3s ease, opacity 0.3s ease;
             }
 
             nav ul li a {
-                width: 100%;
                 display: block;
+                width: 100%;
+                text-align: center;
+                padding: 1rem;
+                border-bottom: 1px solid var(--neon-color);
+                color: #fff;
+                text-decoration: none;
+            }
+
+            nav ul li:last-child a {
+                border-bottom: none;
             }
 
             .logo img {
@@ -200,17 +238,19 @@
 </head>
 <body>
 <header>
-    <div class="logo">
-        <img src="{{ asset('storage/logo.png') }}" alt="MyBrand Logo">
-        <div class="brand-name">《 Radius Project 》</div>
-    </div>
-    <nav>
+    <div class="header-top">
+        <div class="logo">
+            <img src="{{ asset('storage/logo.png') }}" alt="MyBrand Logo">
+            <div class="brand-name">《 Radius Project 》</div>
+        </div>
         <div class="menu-toggle">
             <img src="{{ asset('storage/menu.svg') }}" alt="Menu">
         </div>
+    </div>
+    <nav>
         <ul>
             <li><a href="#">Главная</a></li>
-            <li><a href="https://github.com/RadiusProjectKrd">Контакты</a></li>
+            <li><a href="https://github.com/RadiusProjectKrd">GitHub</a></li>
             <li><a href="/status">Статус</a></li>
         </ul>
     </nav>
