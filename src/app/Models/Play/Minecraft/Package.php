@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
-    protected $table = 'packages';
+    protected $table = 'minecraft_packages';
 
     public $timestamps = false;
 
