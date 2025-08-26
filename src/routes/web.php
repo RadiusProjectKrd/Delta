@@ -12,7 +12,3 @@ use Illuminate\Support\Facades\Config;
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
-
-Route::get('/status', function () {
-    return view('soon');
-});

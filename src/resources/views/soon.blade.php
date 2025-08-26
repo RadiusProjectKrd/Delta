@@ -252,7 +252,7 @@
         <ul>
             <li><a href="/">Главная</a></li>
             <li><a href="https://github.com/RadiusProjectKrd">GitHub</a></li>
-            <li><a href="#">Статус</a></li>
+            <li><a href="https://radius-project.statuspage.io/">Статус</a></li>
         </ul>
     </nav>
 </header>
