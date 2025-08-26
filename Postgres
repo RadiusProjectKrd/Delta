@@ -1,0 +1,14 @@
+# Используем официальный образ PostgreSQL 16 как базовый
+FROM postgres:16
+
+# Копируем скрипт инициализации в контейнер
+COPY ./init-db.sh /docker-entrypoint-initdb.d/init-db.sh
+
+# Делаем скрипт исполняемым
+RUN chmod +x /docker-entrypoint-initdb.d/init-db.sh
+
+# Указываем директорию для хранения данных внутри контейнера
+VOLUME ["/var/lib/postgresql/data"]
+
+# Используем стандартный ENTRYPOINT и CMD из образа postgres
+

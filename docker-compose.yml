@@ -28,6 +28,22 @@ services:
     networks:
       - net
 
+  postgres:
+    image: postgres
+    container_name: postgres_production
+    build:
+      dockerfile: Postgres
+    hostname: db
+    ports:
+      - "5432:5432"
+    networks:
+      - net
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: postgres
+    restart: unless-stopped
+
 networks:
   net:
     driver: bridge
