@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\Play\Minecraft\ProductionController;
 use App\Http\Controllers\Api\Play\Minecraft\TelegramController as MinecraftTelegram;
 use App\Http\Controllers\Api\Security\TelegramController as SecurityTelegram;
 use App\Http\Controllers\Api\Security\AlarmController;
+use App\Http\Controllers\Api\Play\Minecraft\PlayerController;
+use App\Http\Controllers\Api\Security\UserController as UserSecurityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,21 +20,30 @@ Route::get('/', function () {
     return response()->json(['success' => true]);
 });
 
+# Main
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/user', [AuthController::class, 'user'])->middleware(['auth:sanctum']);
 
+# Bots [DEPRECATED!!]
 Route::post('/bot/minecraft', [MinecraftTelegram::class, 'handler']);
 Route::post('/bot/security', [SecurityTelegram::class, 'handler']);
 
-Route::get('/production/get/{name}', [ProductionController::class, 'get'])->middleware(['auth:sanctum']);
-//Route::get('/production/create/{name}/{type}/{ver}', [ProductionController::class, 'create']);
-
-Route::get('/package/download/{prod}', [PackageController::class, 'latest'])->middleware(['auth:sanctum']);
-Route::get('/package/download/{prod}/{build}', [PackageController::class, 'download'])->middleware(['auth:sanctum']);
+# Minecraft
+Route::prefix('/minecraft')->group(function () {
+    Route::get('/player', [PlayerController::class, 'get'])->middleware(['auth:sanctum']);
+    Route::get('/production/get/{name}', [ProductionController::class, 'get'])->middleware(['auth:sanctum']);
+    //Route::get('/production/create/{name}/{type}/{ver}', [ProductionController::class, 'create']);
+    Route::get('/package/download/{prod}', [PackageController::class, 'latest'])->middleware(['auth:sanctum']);
+    Route::get('/package/download/{prod}/{build}', [PackageController::class, 'download'])->middleware(['auth:sanctum']);
 //Route::get('/package/create/{prod}/{ver}', [PackageController::class, 'create']);
+});
 
-Route::get('/security/alarm/{key}', [AlarmController::class, 'open']);
+# Security
+Route::prefix('/security')->group(function () {
+    Route::get('/profile', [UserSecurityController::class, 'get'])->middleware(['auth:sanctum']);
+    Route::get('/alarm/{key}', [AlarmController::class, 'open']);
+});
 
 Route::any('/{path?}', function () {
     return response()->json(['success' => false, 'error' => 'Not found'], 404);

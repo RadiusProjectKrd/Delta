@@ -14,7 +14,7 @@ class PlayerController extends Controller
             $user = Auth::guard('api')->user();
             try {
                 $player = Player::query()->where('user_id', '=', $user->id)->firstOrFail();
-                return response()->json(['success' => true, 'data' => $user]);
+                return response()->json(['success' => true, 'data' => $player]);
             } catch (ModelNotFoundException $e) {
                 return response()->json(['success' => false, 'message' => 'Вы не зарегестрированы в Zetta, свяжитесь с администрацией'], 403);
             }
